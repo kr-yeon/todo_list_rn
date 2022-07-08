@@ -44,15 +44,14 @@ export const PlusText = styled.Text`
 `;
 
 export const Todo = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  
 `;
 
 export const TodoView = styled.TouchableOpacity`
   width: 100%;
   padding-top: 10px;
   padding-bottom: 10px;
+  background-color: #fff9e9;
 `;
 
 export const TodoText = styled.Text`
@@ -80,8 +79,12 @@ export const Border = styled.View`
 `;
 
 export const DelView = styled.TouchableOpacity`
-  margin-left: auto;
-  margin-right: 10px;
+  width: 150px;
+  height: 40px;
+  background-color: red;
+  position: absolute;
+  right: 10px;
+  z-index: -1;
 `;
 
 export const DelText = styled.Text`

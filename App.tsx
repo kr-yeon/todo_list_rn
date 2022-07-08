@@ -1,4 +1,4 @@
-import React, {Suspense, useState} from 'react';
+import React, {Suspense, useEffect, useRef, useState} from 'react';
 import {
   Header,
   Root,
@@ -10,9 +10,9 @@ import {
   TodoView,
   TodoText,
   Border,
+  Todo,
   DelText,
   DelView,
-  Todo,
   CompleteTodoText,
   ModalRoot,
   ModalView,
@@ -22,14 +22,119 @@ import {
   ModalButton,
   ModalButtonText,
 } from './components';
-import {Alert, Modal} from 'react-native';
+import {Alert, Modal, Animated, View} from 'react-native';
 import {RecoilRoot, useRecoilState} from 'recoil';
 import {todo_list} from './recoilState';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 
 interface ITodos {
   value: string;
   complete: boolean;
 }
+
+const TodoTouch = ({
+  todo,
+  setTodo,
+  item,
+  index,
+}: {
+  todo: Array<ITodos>;
+  setTodo: (todos: Array<ITodos>) => void;
+  item: ITodos;
+  index: number;
+}) => {
+  const AnimationXY = useRef(
+    new Animated.ValueXY({
+      x: 0,
+      y: 0,
+    }),
+  ).current;
+  const XY = useRef({
+    x: 0,
+    y: 0,
+  });
+
+  return (
+    <>
+      <PanGestureHandler
+        onGestureEvent={({nativeEvent}) => {
+          XY.current.x = nativeEvent.translationX;
+          AnimationXY.x.setValue(XY.current.x);
+        }}
+        onHandlerStateChange={({nativeEvent}) => {
+          if (nativeEvent.state === 5) {
+            XY.current.x = XY.current.x < -10 ? -60 : 0;
+            Animated.timing(AnimationXY, {
+              useNativeDriver: true,
+              toValue: {
+                x: XY.current.x < -60 ? -60 : 0,
+                y: 0,
+              },
+              duration: 200,
+            }).start();
+          }
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
+          <DelView>
+            <DelText>X</DelText>
+          </DelView>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  translateX: AnimationXY.x,
+                },
+                {
+                  translateY: 0,
+                },
+              ],
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <TodoView
+              activeOpacity={1}
+              onPress={() => {
+                XY.current.x = 0;
+                Animated.timing(AnimationXY, {
+                  useNativeDriver: true,
+                  toValue: {
+                    x: 0,
+                    y: 0,
+                  },
+                  duration: 200,
+                }).start();
+                setTodo([
+                  {
+                    ...item,
+                    complete: !item.complete,
+                  },
+                  ...[
+                    ...todo.filter(s => !s.complete),
+                    ...todo.filter(s => s.complete),
+                  ].filter((_, i) => i !== index),
+                ]);
+              }}>
+              {item.complete ? (
+                <CompleteTodoText>{item.value}</CompleteTodoText>
+              ) : (
+                <TodoText>{item.value}</TodoText>
+              )}
+            </TodoView>
+          </Animated.View>
+        </View>
+      </PanGestureHandler>
+      <Border />
+    </>
+  );
+};
 
 const Application = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -98,41 +203,12 @@ const Application = () => {
         ]}
         renderItem={({item, index}: {item: ITodos; index: number}) => {
           return (
-            <>
-              <Todo>
-                <TodoView
-                  onPress={() => {
-                    setTodo([
-                      {
-                        ...item,
-                        complete: !item.complete,
-                      },
-                      ...[
-                        ...todo.filter(s => !s.complete),
-                        ...todo.filter(s => s.complete),
-                      ].filter((_, i) => i !== index),
-                    ]);
-                  }}>
-                  {item.complete ? (
-                    <CompleteTodoText>{item.value}</CompleteTodoText>
-                  ) : (
-                    <TodoText>{item.value}</TodoText>
-                  )}
-                </TodoView>
-                <DelView
-                  onPress={() => {
-                    setTodo(
-                      [
-                        ...todo.filter(s => !s.complete),
-                        ...todo.filter(s => s.complete),
-                      ].filter((_: ITodos, i: number) => i !== index),
-                    );
-                  }}>
-                  <DelText>X</DelText>
-                </DelView>
-              </Todo>
-              <Border />
-            </>
+            <TodoTouch
+              todo={todo}
+              setTodo={setTodo}
+              item={item}
+              index={index}
+            />
           );
         }}
       />
@@ -144,7 +220,9 @@ export default function () {
   return (
     <Suspense fallback={<SafeRoot />}>
       <RecoilRoot>
-        <Application />
+        <GestureHandlerRootView style={{flex: 1}}>
+          <Application />
+        </GestureHandlerRootView>
       </RecoilRoot>
     </Suspense>
   );
