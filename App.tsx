@@ -59,11 +59,11 @@ const Application = () => {
                     Alert.alert('todo를 입력해주세요.');
                   } else {
                     setTodo([
-                      ...todo,
                       {
                         value: input,
                         complete: false,
                       },
+                      ...todo,
                     ]);
                     setInput('');
                     setModalVisible(false);
@@ -92,12 +92,27 @@ const Application = () => {
             <Border />
           </>
         }
-        data={todo}
+        data={[
+          ...todo.filter(s => !s.complete),
+          ...todo.filter(s => s.complete),
+        ]}
         renderItem={({item, index}: {item: ITodos; index: number}) => {
           return (
             <>
               <Todo>
-                <TodoView>
+                <TodoView
+                  onPress={() => {
+                    setTodo([
+                      {
+                        ...item,
+                        complete: !item.complete,
+                      },
+                      ...[
+                        ...todo.filter(s => !s.complete),
+                        ...todo.filter(s => s.complete),
+                      ].filter((_, i) => i !== index),
+                    ]);
+                  }}>
                   {item.complete ? (
                     <CompleteTodoText>{item.value}</CompleteTodoText>
                   ) : (
@@ -106,7 +121,12 @@ const Application = () => {
                 </TodoView>
                 <DelView
                   onPress={() => {
-                    setTodo(todo.filter((_: ITodos, i: number) => i !== index));
+                    setTodo(
+                      [
+                        ...todo.filter(s => !s.complete),
+                        ...todo.filter(s => s.complete),
+                      ].filter((_: ITodos, i: number) => i !== index),
+                    );
                   }}>
                   <DelText>X</DelText>
                 </DelView>

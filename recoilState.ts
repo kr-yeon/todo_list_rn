@@ -12,7 +12,6 @@ export const todo_list = atom({
   effects: [
     ({onSet}) => {
       onSet(newValue => {
-        console.log('set');
         AsyncStorage.setItem('todo', JSON.stringify(newValue));
       });
     },
