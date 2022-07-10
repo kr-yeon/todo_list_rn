@@ -79,18 +79,21 @@ export const Border = styled.View`
 `;
 
 export const DelView = styled.TouchableOpacity`
-  width: 150px;
+  width: 80px;
   height: 40px;
   background-color: red;
   position: absolute;
-  right: 10px;
+  right: 2px;
   z-index: -1;
+  border-radius: 10px;
 `;
 
 export const DelText = styled.Text`
-  font-weight: 400;
-  font-size: 20px;
-  color: #ff0000;
+  font-weight: 500;
+  font-size: 18px;
+  color: white;
+  text-align: center;
+  line-height: 45px;
 `;
 
 export const ModalRoot = styled.SafeAreaView`
@@ -127,7 +130,7 @@ export const ModalTextInput = styled.TextInput`
   margin-left: auto;
   margin-right: auto;
   margin-top: 15px;
-  vertical-align: top;
+  text-align-vertical: top;
   padding: 5px;
 `;
 
