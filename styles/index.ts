@@ -1,3 +1,4 @@
+// @ts-ignore
 import styled from 'styled-components/native';
 
 export const SafeRoot = styled.SafeAreaView`
@@ -41,10 +42,6 @@ export const PlusText = styled.Text`
   font-weight: 900;
   font-size: 38px;
   color: #afec80;
-`;
-
-export const Todo = styled.View`
-  
 `;
 
 export const TodoView = styled.TouchableOpacity`

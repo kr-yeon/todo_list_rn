@@ -19,6 +19,7 @@ export interface ISlideView {
   rootStyle?: ViewStyle;
   animationDuration?: number;
   setXRef?: MutableRefObject<ISetXRef>;
+  enabled?: boolean;
 }
 
 const SlideView = ({
@@ -33,6 +34,7 @@ const SlideView = ({
   rootStyle,
   animationDuration,
   setXRef,
+  enabled,
 }: ISlideView) => {
   const AnimationX = useRef(new Animated.Value(slide.current)).current;
 
@@ -61,6 +63,7 @@ const SlideView = ({
   return (
     <>
       <PanGestureHandler
+        enabled={enabled ?? true}
         onGestureEvent={({nativeEvent}) => {
           AnimationX.setValue(
             slide.current !== 0
